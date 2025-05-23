@@ -1,10 +1,5 @@
-# mzcst_2024
-
-实现与CST 2024交互的接口。包括`cst.interface`、`cst.results`、`cst.eda`、
+"""实现与CST 2024交互的接口。包括`cst.interface`、`cst.results`、`cst.eda`、
 `cst.asymptotic`、`cst.radar`、`cst.units`。
-
-如果您的CST安装在默认路径（`C:\Program Files\CST Studio 2024\`），那么使用本包将不需
-要额外配置，否则请按照官方帮助配置`PYTHONPATH`。
 
 
 开发本包的主要目的是：规避CST内置Python接口的类型提示缺失问题。
@@ -15,9 +10,6 @@
 
 注意：本模块基于 `Python 3.10.16`、`CST Studio Suite 2024 SP5` 环境开发和调试，未在
 其它环境测试过。
-
-
-以下内容来自CST官方帮助文档。
 
 
 CST Python Libraries
@@ -115,3 +107,38 @@ the following code without error::
 
     >>> import cst
     >>> print(cst.__file__) # should print '<PATH_TO_CST_AMD64>/python_cst_libraries/cst/__init__.py'
+
+
+"""
+
+__version__ = "2025.5.22"
+
+import sys
+
+sys.path.append(r"C:\Program Files (x86)\CST Studio Suite 2024\AMD64\python_cst_libraries")
+
+
+from . import asymptotic  # cst.asymptotic
+from . import eda  # cst.eda
+from . import interface  # cst.interface
+from . import radar  # cst.radar
+from . import results  # cst.results
+from . import units  # cst.units
+from . import (  # cst.asymptotic; _global,
+    common,
+    component,
+    construction_curve,
+    construction_face,
+    curves,
+    group,
+    material,
+    math_,
+    plot,
+    profiles_to_shapes,
+    shape_operations,
+    shapes,
+    solver,
+    sources_and_ports,
+    transformations_and_picks,
+)
+from ._global import BaseObject, Parameter, Units, VbaObject, change_solver_type
