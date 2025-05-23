@@ -22,3 +22,7 @@ dependencies = [
   'matplotlib>=3.3.4',
   'h5py>=3.6.0',
 ]
+
+[project.urls]
+Homepage = "https://github.com/PlasticLie/mzcst_2024"
+Issues = "https://github.com/PlasticLie/mzcst_2024/issues"
