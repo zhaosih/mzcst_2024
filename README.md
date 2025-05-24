@@ -3,7 +3,7 @@
 实现与CST 2024交互的接口。包括`cst.interface`、`cst.results`、`cst.eda`、
 `cst.asymptotic`、`cst.radar`、`cst.units`。
 
-如果您的CST安装在默认路径（`C:\Program Files\CST Studio 2024\`），那么使用本包将不需
+如果您的CST安装在默认路径（`C:\Program Files (x86)\CST Studio 2024\`），那么使用本包将不需
 要额外配置，否则请按照官方帮助配置`PYTHONPATH`。
 
 

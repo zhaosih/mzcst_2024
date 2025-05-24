@@ -111,7 +111,7 @@ the following code without error::
 
 """
 
-__version__ = "2025.5.22"
+__version__ = "2025.5"
 
 import sys
 
