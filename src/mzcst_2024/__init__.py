@@ -111,12 +111,15 @@ the following code without error::
 
 """
 
-__version__ = "2025.5"
+# __version__ = "2025.5"
 
 import sys
 
 sys.path.append(r"C:\Program Files (x86)\CST Studio Suite 2024\AMD64\python_cst_libraries")
 
+import importlib_metadata
+
+__version__ = importlib_metadata.version("mzcst-2024")
 
 from . import asymptotic  # cst.asymptotic
 from . import eda  # cst.eda

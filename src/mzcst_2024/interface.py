@@ -106,7 +106,7 @@ class Model3D:
         """
         return self.model3d.start_solver(timeout=timeout)
 
-    def create_object_from_attributes(self, obj: _global.BaseObject) -> None:
+    def create_object(self, obj: _global.BaseObject) -> None:
         """Creates a new object in the 3D modeler.
 
         Args:
@@ -115,7 +115,22 @@ class Model3D:
         Returns:
             None
         """
-        return obj.create_from_attributes(self)
+
+        try:
+            obj.create_from_attributes(self.model3d)
+        except AttributeError:
+            _logger.warning(
+                "Object %s does not have create_from_attributes method, trying create_from_kwargs.",
+                obj.__class__.__name__,
+            )
+            try:
+                obj.create_from_kwargs(self.model3d)
+            except AttributeError:
+                _logger.error(
+                    "Object %s does not have create_from_attributes or create_from_kwargs method.",
+                    obj.__class__.__name__,
+                )
+        return
 
 
 class Schematic:

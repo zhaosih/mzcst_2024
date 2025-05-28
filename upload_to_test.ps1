@@ -9,8 +9,9 @@ python -m twine upload --repository testpypi dist/* --verbose
 Remove-Item dist/*
 
 # 延迟一段时间
-Write-Output "等待60秒，等待测试服更新"
-Start-Sleep -Seconds 60
+$delay = 60
+Write-Output "等待 $delay 秒，等待测试服更新"
+Start-Sleep -Seconds $delay
 
 # 更新测试包
 pip install -i https://test.pypi.org/simple/ --upgrade mzcst-2024
