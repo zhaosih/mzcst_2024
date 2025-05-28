@@ -15,6 +15,8 @@ from typing import Dict, List, Union
 import cst
 import cst.interface
 
+from . import _global
+
 _logger = logging.getLogger(__name__)
 
 
@@ -103,6 +105,17 @@ class Model3D:
             None:
         """
         return self.model3d.start_solver(timeout=timeout)
+
+    def create_object_from_attributes(self, obj: _global.BaseObject) -> None:
+        """Creates a new object in the 3D modeler.
+
+        Args:
+            obj (_global.BaseObject): The object to create in the modeler.
+
+        Returns:
+            None
+        """
+        return obj.create_from_attributes(self)
 
 
 class Schematic:
