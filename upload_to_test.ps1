@@ -9,7 +9,7 @@ python -m twine upload --repository testpypi dist/* --verbose
 Remove-Item dist/*
 
 # 延迟一段时间
-echo "等待60秒，等待测试服更新"
+Write-Output "等待60秒，等待测试服更新"
 Start-Sleep -Seconds 60
 
 # 更新测试包
