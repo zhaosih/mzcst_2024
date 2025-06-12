@@ -246,8 +246,7 @@ class Parameter(BaseObject):
     def __repr__(self) -> str:
 
         return (
-            f"Parameter({quoted(self.name)}, "
-            + f"{quoted(self.expression)}, {quoted(self.description)})"
+            f"Parameter({quoted(self.name)}, {quoted(self.expression)}, {quoted(self.description)})"
         )
 
     def __str__(self) -> str:
@@ -261,23 +260,20 @@ class Parameter(BaseObject):
         return super().__format__(format_spec)
 
     def __add__(self, other: "Parameter") -> "Parameter":
-
-        temp: str = self.name + " + " + other.name
+        temp = f"({self.name} + {other.name})"
         return Parameter(temp)
 
     def __sub__(self, other: "Parameter") -> "Parameter":
-        temp: str = self.name + " - " + other.name
-
+        temp = f"({self.name} - {other.name})"
         return Parameter(temp)
 
     def __mul__(self, other: "Parameter") -> "Parameter":
-        temp: str = self.name + " * " + other.name
+        temp = f"({self.name} * {other.name})"
 
         return Parameter(temp)
 
     def __truediv__(self, other: "Parameter") -> "Parameter":
-        temp: str = self.name + " / " + other.name
-
+        temp = f"({self.name} / {other.name})"
         return Parameter(temp)
 
     def __abs__(self) -> "Parameter":
@@ -285,15 +281,15 @@ class Parameter(BaseObject):
         return Parameter(temp)
 
     def __pos__(self) -> "Parameter":
-        temp: str = "+" + self.name
+        temp = f"(+{self.name})"
         return Parameter(temp)
 
     def __neg__(self) -> "Parameter":
-        temp: str = "-" + self.name
+        temp = f"(-{self.name})"
         return Parameter(temp, temp)
 
     def __pow__(self, power: "Parameter") -> "Parameter":
-        temp: str = self.name + "^" + power.name
+        temp=f"({self.name} ^ {power.name})"
         return Parameter(temp, temp)
 
     def rename(self, n: str) -> "Parameter":
