@@ -245,9 +245,7 @@ class Parameter(BaseObject):
 
     def __repr__(self) -> str:
 
-        return (
-            f"Parameter({quoted(self.name)}, {quoted(self.expression)}, {quoted(self.description)})"
-        )
+        return f"Parameter({quoted(self.name)}, {quoted(self.expression)}, {quoted(self.description)})"
 
     def __str__(self) -> str:
         # s1 = "Name: " + self.name + "; "
@@ -256,24 +254,36 @@ class Parameter(BaseObject):
         # return s1 + s2 + s3
         return self.name
 
-    def __format__(self, format_spec):
+    def __format__(self, format_spec:str):
         return super().__format__(format_spec)
 
     def __add__(self, other: "Parameter") -> "Parameter":
-        temp = f"({self.name} + {other.name})"
+        if isinstance(other, Parameter):
+            temp = f"({self.name} + {other.name})"
+        else:
+            temp = f"({self.name} + {other})"
         return Parameter(temp)
 
     def __sub__(self, other: "Parameter") -> "Parameter":
-        temp = f"({self.name} - {other.name})"
+        if isinstance(other, Parameter):
+            temp = f"({self.name} - {other.name})"
+        else:
+            temp = f"({self.name} - {other})"
         return Parameter(temp)
 
     def __mul__(self, other: "Parameter") -> "Parameter":
-        temp = f"({self.name} * {other.name})"
+        if isinstance(other, Parameter):
+            temp = f"({self.name} * {other.name})"
+        else:
+            temp = f"({self.name} * {other})"
 
         return Parameter(temp)
 
     def __truediv__(self, other: "Parameter") -> "Parameter":
-        temp = f"({self.name} / {other.name})"
+        if isinstance(other, Parameter):
+            temp = f"({self.name} / {other.name})"
+        else:
+            temp = f"({self.name} / {other})"
         return Parameter(temp)
 
     def __abs__(self) -> "Parameter":
@@ -286,11 +296,11 @@ class Parameter(BaseObject):
 
     def __neg__(self) -> "Parameter":
         temp = f"(-{self.name})"
-        return Parameter(temp, temp)
+        return Parameter(temp)
 
     def __pow__(self, power: "Parameter") -> "Parameter":
-        temp=f"({self.name} ^ {power.name})"
-        return Parameter(temp, temp)
+        temp = f"({self.name} ^ {power.name})"
+        return Parameter(temp)
 
     def rename(self, n: str) -> "Parameter":
         """重命名参数。
