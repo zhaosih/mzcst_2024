@@ -72,18 +72,11 @@ class Solid(BaseObject):
         """
         return f"{self.component}:{self.name}"
 
-    # def create(self, modeler: "cst.interface.Model3D") -> "Solid":
-    #     """检查实体是否被创建过。用于给子类定义create函数。"""
-    #     if not self.object_is_created:
-    #         self._object_is_created = True
-    #     else:
-    #         _logger.error(
-    #             OPERATION_FAILED,
-    #             f'define solid: "{self.component}:{self.name}"',
-    #         )
-    #     return self
-
-    
+    def create(
+        self, modeler: interface.Model3D  # pylint: disable=unused-argument
+    ) -> "Solid":
+        """用于给子类定义create函数。"""
+        return self
 
     def create_from_attributes(self, modeler: "interface.Model3D") -> "Solid":
         """从属性字典新建实体。
@@ -122,7 +115,7 @@ class Solid(BaseObject):
         """This method adds two solids. The added solid will be stored under `solid1` and the second solid will be deleted.
 
         `Add ( solidname solid1, solidname solid2 )`
-        
+
 
         Args:
             modeler (interface.Model3D): 建模环境。
@@ -194,10 +187,12 @@ class Solid(BaseObject):
         self._history += [title]
         _logger.info(OPERATION_SUCCESS, title)
         return self
-    
-    def merge_materials_of_component(self, modeler: "interface.Model3D", name: "Solid") -> "Solid":
+
+    def merge_materials_of_component(
+        self, modeler: "interface.Model3D", name: "Solid"
+    ) -> "Solid":
         """This method has not been used in scripts, BE CAREFULL.\n
-        
+
         The parameter `name` can be a `componentname` or a `solidname`.
 
         If it is a `componentname` the function will merge all shapes from one component with the same material like the boolean operation add.
@@ -217,7 +212,6 @@ class Solid(BaseObject):
         self._history += [title]
         _logger.info(OPERATION_SUCCESS, title)
         return self
-
 
 
 def solid_add(modeler: "interface.Model3D", s1: Solid, s2: Solid) -> None:

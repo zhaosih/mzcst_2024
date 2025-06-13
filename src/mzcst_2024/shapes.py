@@ -18,7 +18,7 @@ _logger = logging.getLogger(__name__)
 
 class Brick(Solid):
     """This object is used to create a new brick shape.
-    
+
     Attributes:
         name (str): 名称。
         xmin (str): `x`下界。
@@ -30,6 +30,7 @@ class Brick(Solid):
         component (str): 所在组件名。
         material (str): 材料名。
     """
+
     def __init__(
         self,
         name: str,
@@ -133,7 +134,7 @@ class Brick(Solid):
             "End With",
         ]
         cmd = NEW_LINE.join(sCommand)
-        
+
         modeler.add_to_history(self._history_title, cmd)
         _logger.info("Brick %s:%s created.", self._component, self._name)
         return self
@@ -141,13 +142,14 @@ class Brick(Solid):
 
 class AnalyticalFace(Solid):
     """This object is used to create a new analytical face shape.
-    
+
     Attributes:
         name (str): 实体名称。
         component (str | Component): 实体所在的部件（component）名称。
         material (str | Material): 实体的材料名称。
-    
+
     """
+
     u = Parameter("u")
     v = Parameter("v")
 
@@ -221,4 +223,130 @@ class AnalyticalFace(Solid):
         _logger.info(
             "Analytical Face %s:%s created.", self.component, self.name
         )
+        return self
+
+
+class Cylinder(Solid):
+    """This object is used to create a new cylinder shape.
+
+    Attributes:
+        name (str): 名称。
+        r_in (str): 半径。
+        r_out (str): 半径。
+        height (str): 高度。
+        component (str): 所在组件名。
+        material (str): 材料名。
+    """
+
+    def __init__(
+        self,
+        name: str,
+        component: str,
+        material: str,
+        axis: str,
+        r_in: str,
+        r_out: str,
+        center_1: str,
+        center_2: str,
+        range_1: str,
+        range_2: str,
+        segments: int = 0,
+    ) -> None:
+        super().__init__(name, component, material)
+        self._axis: str = axis
+        self._r_in: str = r_in
+        self._r_out: str = r_out
+        self._center_1: str = center_1
+        self._center_2: str = center_2
+        self._range_1: str = range_1
+        self._range_2: str = range_2
+        self._segments: int = segments
+        self._history_title = f'define cylinder: "{self.component}:{self.name}"'
+        return
+
+    @property
+    def r_in(self) -> str:
+        return self._r_in
+
+    @property
+    def range(self) -> tuple[str, str]:
+        return (self._range_1, self._range_2)
+
+    @property
+    def center(self) -> tuple[str, str]:
+        return (self._center_1, self._center_2)
+
+    @property
+    def component(self) -> str:
+        return self._component
+
+    @property
+    def material(self) -> str:
+        return self._material
+
+    @property
+    def segments(self) -> int:
+        """This setting specifies how the cylinder's geometry is modelled,
+        either as a smooth surface of by a facetted approximation. If this value
+        is set to "0", an analytical (smooth) representation of the cylinder
+        will be created. If this number is set to another value greater than 2,
+        the cylinder's face will be approximated by this number of planar facets.
+        The higher the number of segments, the better the representation of the
+        cylinder will be."""
+        return self._segments
+
+    def create(self, modeler):
+        """定义圆柱体。
+
+        Parameters
+        ----------
+        modeler : Model3D
+            建模环境。
+
+        Returns
+        -------
+        self
+            自身的引用。
+        """
+        sCommand = [
+            "With Cylinder ",
+            ".Reset ",
+            f'.Name "{self._name}" ',
+            f'.Component "{self._component}" ',
+            f'.Material "{self._material}" ',
+            f'.OuterRadius "{self._r_out}" ',
+            f'.InnerRadius "{self._r_in}" ',
+            f'.Axis "{self._axis}" ',
+        ]
+        match self._axis:
+            case "X":
+                sCommand += [
+                    f'.Xrange "-{self._range_1}", "0" ',
+                    f'.Ycenter "{self._center_1}" ',
+                    f'.Zcenter "{self._center_2}" ',
+                ]
+            case "Y":
+                sCommand += [
+                    f'.Yrange "-{self._range_1}", "0" ',
+                    f'.Xcenter "{self._center_1}" ',
+                    f'.Zcenter "{self._center_2}" ',
+                ]
+            case "Z":
+                sCommand += [
+                    f'.Zrange "-{self._range_1}", "0" ',
+                    f'.Xcenter "{self._center_1}" ',
+                    f'.Ycenter "{self._center_2}" ',
+                ]
+
+        sCommand += [
+            f'.Segments "{self._segments}" ',
+            ".Create ",
+            "End With",
+        ]
+
+        cmd = NEW_LINE.join(sCommand)
+
+        modeler.add_to_history(self._history_title, cmd)
+        _logger.info("Cylinder %s:%s created.", self._component, self._name)
+
         return self
