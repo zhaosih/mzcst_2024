@@ -17,7 +17,12 @@ Write-Output "暂停 $delay 秒，等待测试服更新"
 # Start-Sleep -Seconds $delay
 for ($i = $delay; $i -gt 0; $i = $i - $interval) {
     Write-Output "还有 $i 秒"
-    Start-Sleep -Seconds $interval
+    if ($i -gt $interval) {
+        Start-Sleep -Seconds $interval
+    }
+    else {
+        Start-Sleep -Seconds $i
+    }
 }
 
 # 更新测试包
