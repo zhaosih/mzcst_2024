@@ -318,7 +318,7 @@ class Cylinder(Solid):
             f'.InnerRadius "{self._r_in}" ',
             f'.Axis "{self._axis}" ',
         ]
-        match self._axis:
+        match self._axis.upper():
             case "X":
                 sCommand += [
                     f'.Xrange "-{self._range_1}", "0" ',
