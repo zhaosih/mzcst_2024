@@ -1,3 +1,6 @@
+# 更新元数据
+python .\meta_modify.py
+
 # 封包
 python -m build
 
