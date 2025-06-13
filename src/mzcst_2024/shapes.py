@@ -321,22 +321,29 @@ class Cylinder(Solid):
         match self._axis.upper():
             case "X":
                 sCommand += [
-                    f'.Xrange "-{self._range_1}", "0" ',
+                    f'.Xrange "{self._range_1}", "{self._range_2}" ',
                     f'.Ycenter "{self._center_1}" ',
                     f'.Zcenter "{self._center_2}" ',
                 ]
             case "Y":
                 sCommand += [
-                    f'.Yrange "-{self._range_1}", "0" ',
+                    f'.Yrange "{self._range_1}", "{self._range_2}" ',
                     f'.Xcenter "{self._center_1}" ',
                     f'.Zcenter "{self._center_2}" ',
                 ]
             case "Z":
                 sCommand += [
-                    f'.Zrange "-{self._range_1}", "0" ',
+                    f'.Zrange "{self._range_1}", "{self._range_2}" ',
                     f'.Xcenter "{self._center_1}" ',
                     f'.Ycenter "{self._center_2}" ',
                 ]
+            case _:
+                _logger.error(
+                    "Cylinder axis must be one of 'X', 'Y', or 'Z'."
+                )
+                raise ValueError(
+                    f"Invalid axis: {self._axis}. Must be 'X', 'Y', or 'Z'."
+                )
 
         sCommand += [
             f'.Segments "{self._segments}" ',
