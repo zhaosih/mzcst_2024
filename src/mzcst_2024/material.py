@@ -1,5 +1,4 @@
-"""定义 `Material` 类和与其相关的方法。
-"""
+"""定义 `Material` 类和与其相关的方法。"""
 
 import enum
 import logging
@@ -227,5 +226,68 @@ PEC_: str = "PEC"
 VACUUM_: str = "Vaccum"
 
 
-PEC: Material = Material("PEC")
-VACUUM: Material = Material("Vacuum")
+PEC = Material("PEC")
+VACUUM = Material("Vacuum")
+
+# 常用材料
+copper_annealed = Material(
+    "Copper (annealed)",
+    properties={
+        "FrqType": ' "all"',
+        "Type": ' "Lossy metal"',
+        "SetMaterialUnit": ' "GHz", "mm"',
+        "Mu": ' "1.0"',
+        "Kappa": ' "5.8e+007"',
+        "Rho": ' "8930.0"',
+        "ThermalType": ' "Normal"',
+        "ThermalConductivity": ' "401.0"',
+        "SpecificHeat": ' "390", "J/K/kg"',
+        "MetabolicRate": ' "0"',
+        "BloodFlow": ' "0"',
+        "VoxelConvection": ' "0"',
+        "MechanicsType": ' "Isotropic"',
+        "YoungsModulus": ' "120"',
+        "PoissonsRatio": ' "0.33"',
+        "ThermalExpansionRate": ' "17"',
+        "Colour": ' "1", "1", "0"',
+        "Wireframe": ' "False"',
+        "Reflection": ' "False"',
+        "Allowoutline": ' "True"',
+        "Transparentoutline": ' "False"',
+        "Transparency": ' "0"',
+    },
+)
+
+rogers_RT5880_lossy = Material(
+    "Rogers RT5880 (lossy)",
+    properties={
+        "FrqType": '"all"',
+        "Type": '"Normal"',
+        "SetMaterialUnit": '"GHz", "mm"',
+        "Epsilon": '"2.2"',
+        "Mu": '"1.0"',
+        "Kappa": '"0.0"',
+        "TanD": '"0.0009"',
+        "TanDFreq": '"10.0"',
+        "TanDGiven": '"True"',
+        "TanDModel": '"ConstTanD"',
+        "KappaM": '"0.0"',
+        "TanDM": '"0.0"',
+        "TanDMFreq": ' "0.0"',
+        "TanDMGiven": '"False"',
+        "TanDMModel": '"ConstKappa"',
+        "DispModelEps": '"None"',
+        "DispModelMu": '"None"',
+        "DispersiveFittingSchemeEps": '"General 1st"',
+        "DispersiveFittingSchemeMu": '"General 1st"',
+        "UseGeneralDispersionEps": '"False"',
+        "UseGeneralDispersionMu": '"False"',
+        "Rho": '"0.0"',
+        "ThermalType": '"Normal"',
+        "ThermalConductivity": '"0.20"',
+        "SetActiveMaterial": '"all"',
+        "Colour": '"0.94", "0.82", "0.76"',
+        "Wireframe": '"False"',
+        "Transparency": '"0"',
+    },
+)

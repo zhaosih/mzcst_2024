@@ -1,6 +1,5 @@
 import time
 
-import toml
 import tomli
 import tomli_w
 
