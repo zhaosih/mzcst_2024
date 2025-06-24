@@ -220,8 +220,9 @@ class Parameter(BaseObject):
             self._expression: str = self._name
         else:
             self._expression = str(expression)
+            if isinstance(expression, int | float):
+                self._value = expression
         self._description: str = description
-        # self._value: float = 0
         return
 
     # 属性方法
@@ -236,8 +237,18 @@ class Parameter(BaseObject):
 
     @property
     def value(self) -> float:
-        # self._value = ast.literal_eval(self._expression)
-        return ast.literal_eval(self._expression)
+        """表达式的值
+
+        Returns
+        -------
+        float
+            如果表达式是整数或浮点数，那么返回其数值，否则抛出异常后返回NaN
+        """
+        try:
+            return self._value
+        except NameError:
+            _logger.error("value does not exist.")
+        return float("nan")
 
     @property
     def description(self) -> str:
@@ -248,13 +259,9 @@ class Parameter(BaseObject):
         return f"Parameter({quoted(self.name)}, {quoted(self.expression)}, {quoted(self.description)})"
 
     def __str__(self) -> str:
-        # s1 = "Name: " + self.name + "; "
-        # s2 = "Expression: " + self.expression + "; "
-        # s3 = "Description: " + self.description + ". "
-        # return s1 + s2 + s3
         return self.name
 
-    def __format__(self, format_spec:str):
+    def __format__(self, format_spec: str):
         return super().__format__(format_spec)
 
     def __add__(self, other: "Parameter") -> "Parameter":
