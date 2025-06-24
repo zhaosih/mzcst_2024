@@ -175,6 +175,31 @@ class Component(BaseObject):
         _logger.info("%s", title)
         return self
 
+    def create_sub_component(
+        self,
+        modeler: interface.Model3D,
+        sub_component_name: str | typing.Iterable[str],
+    ) -> "Component":
+        """创建子组件。
+
+        Args:
+            modeler (interface.Model3D): 建模器。
+            sub_component_name (str): 子组件名称。
+
+        Returns:
+            Component: 新创建的子组件。
+        """
+        if isinstance(sub_component_name, str):
+            new_comp_name = "/".join([self._name, sub_component_name])
+        elif isinstance(sub_component_name, typing.Iterable):
+            new_comp_name = join([self._name, *sub_component_name])
+        else:
+            raise TypeError(
+                f"sub_component_name must be str or Iterable[str], got {type(sub_component_name)}"
+            )
+        
+        return Component(new_comp_name).create(modeler)
+
 
 def join(iterable: typing.Iterable[str]) -> str:
     r = "/".join(iterable)

@@ -14,7 +14,7 @@ Write-Output "删除本地打包文件"
 Remove-Item dist/*
 
 # 延迟一段时间
-$delay = 60
+$delay = 90
 Write-Output "暂停 $delay 秒，等待测试服更新"
 # Start-Sleep -Seconds $delay
 for ($i = 0; $i -lt $delay; $i ++) {

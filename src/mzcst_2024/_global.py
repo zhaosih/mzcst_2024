@@ -221,7 +221,7 @@ class Parameter(BaseObject):
         else:
             self._expression = str(expression)
         self._description: str = description
-        self._value: float = 0
+        # self._value: float = 0
         return
 
     # 属性方法
@@ -236,8 +236,8 @@ class Parameter(BaseObject):
 
     @property
     def value(self) -> float:
-        self._value = ast.literal_eval(self._expression)
-        return self._value
+        # self._value = ast.literal_eval(self._expression)
+        return ast.literal_eval(self._expression)
 
     @property
     def description(self) -> str:
