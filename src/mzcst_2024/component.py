@@ -1,5 +1,4 @@
-"""定义 `Component` 类和与其相关的方法。
-"""
+"""定义 `Component` 类和与其相关的方法。"""
 
 import logging
 import typing
@@ -77,11 +76,6 @@ class Component(BaseObject):
         modeler.add_to_history(title, cmd)
         _logger.info("%s", title)
         return
-
-    @staticmethod
-    def join(iterable: typing.Iterable[str]) -> str:
-        r = "/".join(iterable)
-        return r
 
     @property
     def name(self) -> str:
@@ -182,6 +176,11 @@ class Component(BaseObject):
         return self
 
 
+def join(iterable: typing.Iterable[str]) -> str:
+    r = "/".join(iterable)
+    return r
+
+
 if __name__ == "__main__":
-    print(Component.join(["fuck", "shit"]))
+    print(join(["fuck", "shit"]))
     pass
