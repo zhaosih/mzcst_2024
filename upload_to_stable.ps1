@@ -1,3 +1,7 @@
+# 删除旧的安装包
+Remove-Item dist/*
+
+
 # 更新元数据
 python .\meta_modify.py stable
 
@@ -8,10 +12,6 @@ python -m build
 # 测试服
 Write-Output "上传到正式服"
 python -m twine upload dist/* --verbose
-
-# 删除本地打包文件
-Write-Output "删除本地打包文件"
-Remove-Item dist/*
 
 exit 0
 
