@@ -1,5 +1,5 @@
 # 更新元数据
-python .\meta_modify.py
+python .\meta_modify.py -c test
 
 # 封包
 python -m build
