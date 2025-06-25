@@ -1,9 +1,13 @@
-import argparse
+# -*- coding: utf-8 -*-
 import sys
 import time
 
 import tomli
 import tomli_w
+
+STABLE_VERSION = [
+    "0.1.0",
+]
 
 
 def version(tag: str = "test") -> str:
@@ -12,27 +16,23 @@ def version(tag: str = "test") -> str:
             current_time = time.localtime()
             time_str_ = f"{current_time.tm_year:04d}.{current_time.tm_mon:02d}.{current_time.tm_mday:02d}.{current_time.tm_hour:02d}{current_time.tm_min:02d}"
             version_name = time_str_
-        case "official":
+        case "stable":
             current_time = time.localtime()
-            version_name = "0.1.0"
+            version_name = STABLE_VERSION[-1]
         case _:
-            raise ValueError(f"Unknown tag: {tag}, expected 'test' or 'official'.")
+            raise ValueError(
+                f"Unknown tag: {tag}, expected 'test' or 'stable'."
+            )
     return version_name
 
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c",
-        "--channel",
-        help="选择上传通道（test 或 official，默认为 test）",
-        default="test",
-    )
+    argc = len(sys.argv)
+    argv = sys.argv
 
-    args = parser.parse_args()
+    current_version = version(argv[1] if argc > 1 else "test")
 
-    current_version = version(args.channel)
     with open("pyproject.toml", "rb") as f:
         meta = tomli.load(f)
         meta["project"]["version"] = current_version

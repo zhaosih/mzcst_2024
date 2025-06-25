@@ -1,5 +1,5 @@
 # 更新元数据
-# python .\meta_modify.py -c official
+python .\meta_modify.py stable
 
 # 封包
 python -m build

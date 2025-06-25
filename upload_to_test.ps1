@@ -2,7 +2,7 @@
 Remove-Item dist/*
 
 # 更新元数据
-python .\meta_modify.py -c test
+python .\meta_modify.py test
 
 # 封包
 python -m build
