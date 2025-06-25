@@ -1,3 +1,6 @@
+# 删除旧的安装包
+Remove-Item dist/*
+
 # 更新元数据
 python .\meta_modify.py -c test
 
@@ -11,7 +14,7 @@ python -m twine upload --repository testpypi dist/* --verbose
 
 # 删除本地打包文件
 Write-Output "删除本地打包文件"
-Remove-Item dist/*
+
 
 # 延迟一段时间
 $delay = 90
