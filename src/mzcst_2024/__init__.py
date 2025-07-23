@@ -13,15 +13,19 @@
 
 """
 
-# __version__ = "2025.5"
+__version__ = "2025.5"
 
 import sys
 
 sys.path.append(r"C:\Program Files (x86)\CST Studio Suite 2024\AMD64\python_cst_libraries")
 
-import importlib_metadata
-
-__version__ = importlib_metadata.version("mzcst-2024")
+# 尝试获取包版本，如果失败则使用默认版本
+try:
+    import importlib_metadata
+    __version__ = importlib_metadata.version("mzcst-2024")
+except Exception:
+    # 使用默认版本，不报错
+    pass
 
 from . import asymptotic  # cst.asymptotic
 from . import eda  # cst.eda

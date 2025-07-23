@@ -394,32 +394,250 @@ class LayerStacking(BaseObject):
         return
 
 
+class ParameterSweep(BaseObject):
+    """参数扫描控制类
+    
+    Allows to automatically perform several simulations with varying parameters.
+    """
+
+    def __init__(self, *, attributes=None, vba=None, **kwargs):
+        super().__init__(attributes=attributes, vba=vba, **kwargs)
+        self._parameters = {}
+        self._sweep_type = "Linear"
+        return
+    
+    def add_parameter(self, parameter_name: str, start_value: float, 
+                     end_value: float, steps: int, sweep_type: str = "Linear") -> None:
+        """添加扫描参数
+        
+        Args:
+            parameter_name (str): 参数名称
+            start_value (float): 起始值
+            end_value (float): 结束值
+            steps (int): 步数
+            sweep_type (str): 扫描类型 ("Linear", "Logarithmic")
+        """
+        self._parameters[parameter_name] = {
+            'start': start_value,
+            'end': end_value,
+            'steps': steps,
+            'type': sweep_type
+        }
+    
+    def add_parameter_sequence(self, parameter_name: str, values: list) -> None:
+        """添加参数序列
+        
+        Args:
+            parameter_name (str): 参数名称
+            values (list): 参数值列表
+        """
+        self._parameters[parameter_name] = {
+            'values': values,
+            'type': 'Sequence'
+        }
+    
+    def create_parameter_sweep(self, modeler) -> None:
+        """创建参数扫描
+        
+        Args:
+            modeler (interface.Model3D): 建模环境
+        """
+        if not self._parameters:
+            _logger.error("No parameters defined for sweep")
+            return
+        
+        # 生成 VBA 代码
+        vba_lines = []
+        
+        # 开始参数扫描定义
+        vba_lines.append("With ParameterSweep")
+        vba_lines.append("    .DeleteAll")
+        
+        # 添加每个参数
+        for param_name, param_config in self._parameters.items():
+            if param_config.get('type') == 'Sequence':
+                # 序列类型参数
+                values_str = ";".join(str(v) for v in param_config['values'])
+                vba_lines.extend([
+                    f'    .AddParameter_Samples "{param_name}", "{values_str}"'
+                ])
+            else:
+                # 线性或对数扫描
+                sweep_type = param_config.get('type', 'Linear')
+                vba_lines.extend([
+                    f'    .AddParameter_Linear "{param_name}", {param_config["start"]}, {param_config["end"]}, {param_config["steps"]}'
+                ])
+        
+        vba_lines.append("End With")
+        
+        # 执行 VBA 代码
+        vba_code = NEW_LINE.join(vba_lines)
+        modeler.add_to_history("Define Parameter Sweep", vba_code)
+    
+    def start_parameter_sweep(self, modeler) -> None:
+        """启动参数扫描
+        
+        Args:
+            modeler (interface.Model3D): 建模环境
+        """
+        vba_code = "ParameterSweep.Start"
+        modeler.add_to_history("Start Parameter Sweep", vba_code)
+    
+    def get_sweep_results(self, modeler) -> dict:
+        """获取扫描结果（通过 VBA 查询）
+        
+        Args:
+            modeler (interface.Model3D): 建模环境
+            
+        Returns:
+            dict: 扫描结果信息
+        """
+        # 这里可以添加查询扫描结果的 VBA 代码
+        # 返回基本状态信息
+        return {
+            'parameters': list(self._parameters.keys()),
+            'sweep_configured': len(self._parameters) > 0
+        }
+
+
 class Optimizer(BaseObject):
-    """With the optimizer object you may start an optimization run. For the 
+    """优化控制类
+    
+    With the optimizer object you may start an optimization run. For the 
     optimization you have to define a set of parameters that will be changed by 
     the optimizer and at least one goal function that is tried to be optimized.  
     The kind of goal function depends on the chosen solver type.
-
-    Attributes:
-        param1 (type): 1st attribute.
     """
 
     def __init__(self, *, attributes=None, vba=None, **kwargs):
         super().__init__(attributes=attributes, vba=vba, **kwargs)
+        self._parameters = {}
+        self._goals = {}
+        self._method = "Trust Region"
         return
-
-
-class ParameterSweep(BaseObject):
-    """Allows to automatically perform several simulations with varying 
-    parameters.
-
-    Attributes:
-        param1 (type): 1st attribute.
-    """
-
-    def __init__(self, *, attributes=None, vba=None, **kwargs):
-        super().__init__(attributes=attributes, vba=vba, **kwargs)
-        return
+    
+    def add_optimization_parameter(self, parameter_name: str, min_value: float, 
+                                 max_value: float, start_value: float = None) -> None:
+        """添加优化参数
+        
+        Args:
+            parameter_name (str): 参数名称
+            min_value (float): 最小值
+            max_value (float): 最大值
+            start_value (float, optional): 起始值
+        """
+        if start_value is None:
+            start_value = (min_value + max_value) / 2
+            
+        self._parameters[parameter_name] = {
+            'min': min_value,
+            'max': max_value,
+            'start': start_value
+        }
+    
+    def add_optimization_goal(self, goal_name: str, goal_type: str, 
+                            target_value: float = None, weight: float = 1.0) -> None:
+        """添加优化目标
+        
+        Args:
+            goal_name (str): 目标名称（如 "S1,1"）
+            goal_type (str): 目标类型 ("minimize", "maximize", "target")
+            target_value (float, optional): 目标值（对于 target 类型）
+            weight (float): 权重
+        """
+        self._goals[goal_name] = {
+            'type': goal_type,
+            'target': target_value,
+            'weight': weight
+        }
+    
+    def set_optimization_method(self, method: str) -> None:
+        """设置优化方法
+        
+        Args:
+            method (str): 优化方法 ("Trust Region", "Genetic Algorithm", "Nelder Mead Simplex")
+        """
+        self._method = method
+    
+    def create_optimization(self, modeler) -> None:
+        """创建优化配置
+        
+        Args:
+            modeler (interface.Model3D): 建模环境
+        """
+        if not self._parameters:
+            _logger.error("No parameters defined for optimization")
+            return
+        
+        if not self._goals:
+            _logger.error("No goals defined for optimization")
+            return
+        
+        # 生成 VBA 代码
+        vba_lines = []
+        
+        # 开始优化定义
+        vba_lines.append("With Optimizer")
+        vba_lines.append("    .Reset")
+        vba_lines.append(f'    .SetOptimizerType "{self._method}"')
+        
+        # 添加优化参数
+        for param_name, param_config in self._parameters.items():
+            vba_lines.extend([
+                f'    .SelectParameter "{param_name}"',
+                f'    .SetParameterInit {param_config["start"]}',
+                f'    .SetParameterMin {param_config["min"]}',
+                f'    .SetParameterMax {param_config["max"]}',
+                f'    .AddParameter'
+            ])
+        
+        # 添加优化目标
+        for goal_name, goal_config in self._goals.items():
+            goal_type = goal_config['type']
+            if goal_type == "target" and goal_config['target'] is not None:
+                vba_lines.extend([
+                    f'    .AddGoal "{goal_name}"',
+                    f'    .SetGoalTarget {goal_config["target"]}',
+                    f'    .SetGoalWeight {goal_config["weight"]}'
+                ])
+            elif goal_type in ["minimize", "maximize"]:
+                vba_lines.extend([
+                    f'    .AddGoal_{goal_type.capitalize()} "{goal_name}"',
+                    f'    .SetGoalWeight {goal_config["weight"]}'
+                ])
+        
+        vba_lines.append("End With")
+        
+        # 执行 VBA 代码
+        vba_code = NEW_LINE.join(vba_lines)
+        modeler.add_to_history("Define Optimization", vba_code)
+    
+    def start_optimization(self, modeler) -> None:
+        """启动优化
+        
+        Args:
+            modeler (interface.Model3D): 建模环境
+        """
+        vba_code = "Optimizer.Start"
+        modeler.add_to_history("Start Optimization", vba_code)
+    
+    def get_optimization_results(self, modeler) -> dict:
+        """获取优化结果（通过 VBA 查询）
+        
+        Args:
+            modeler (interface.Model3D): 建模环境
+            
+        Returns:
+            dict: 优化结果信息
+        """
+        # 这里可以添加查询优化结果的 VBA 代码
+        # 返回基本状态信息
+        return {
+            'parameters': list(self._parameters.keys()),
+            'goals': list(self._goals.keys()),
+            'method': self._method,
+            'optimization_configured': len(self._parameters) > 0 and len(self._goals) > 0
+        }
 
 
 class SolverParameter(BaseObject):

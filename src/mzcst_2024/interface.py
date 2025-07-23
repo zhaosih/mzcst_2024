@@ -106,6 +106,45 @@ class Model3D:
         """
         return self.model3d.start_solver(timeout=timeout)
 
+    def get_solver_run_info(self, *, timeout: int = None) -> dict:
+        """获取求解器运行信息
+        
+        Retrieves as dict containing information on the last or current solver run.
+        
+        Args:
+            timeout (int, optional): 执行时间限制. Defaults to None.
+            
+        Returns:
+            dict: 求解器运行信息
+        """
+        return self.model3d.get_solver_run_info(timeout)
+    
+    def full_history_rebuild(self, *, timeout: int = None) -> None:
+        """触发完整的历史重建
+        
+        Trigger a full rebuild of the modeler history.
+        
+        Args:
+            timeout (int, optional): 执行时间限制. Defaults to None.
+            
+        Returns:
+            None
+        """
+        return self.model3d.full_history_rebuild(timeout)
+    
+    def get_tree_items(self, *, timeout: int = None) -> List[str]:
+        """获取项目树的所有项目路径
+        
+        Returns a flat list of all tree paths.
+        
+        Args:
+            timeout (int, optional): 执行时间限制. Defaults to None.
+            
+        Returns:
+            List[str]: 所有树路径的列表
+        """
+        return self.model3d.get_tree_items(timeout)
+
     def create_object(self, obj: _global.BaseObject) -> None:
         """Creates a new object in the 3D modeler.
 
@@ -156,6 +195,60 @@ class Project:
         self._model3d = Model3D(self._proj.model3d)
         self._dsn_env = DesignEnvironment(self._proj.design_environment)
         pass
+    
+    @staticmethod
+    def open(path: os.PathLike) -> "Project":
+        """在新的或现有的设计环境中打开项目
+        
+        Opens the given project in an existing or new DesignEnvironment.
+        
+        Args:
+            path (os.PathLike): CST 项目文件的路径
+            
+        Returns:
+            Project: 项目实例
+            
+        Raises:
+            RuntimeError: 如果项目已经打开
+        """
+        proj = cst.interface.Project.open(path)
+        return Project(proj)
+    
+    @staticmethod
+    def connect(cst_file: os.PathLike) -> "Project":
+        """连接到现有设计环境中的项目
+        
+        Connects to the given project file in an existing DesignEnvironment.
+        
+        Args:
+            cst_file (os.PathLike): CST 项目文件的路径
+            
+        Returns:
+            Project: 项目实例
+            
+        Raises:
+            UserWarning: 如果项目未打开或不存在
+        """
+        proj = cst.interface.Project.connect(cst_file)
+        return Project(proj)
+    
+    @staticmethod
+    def connect_or_open(cst_file: os.PathLike) -> "Project":
+        """连接到现有项目或打开新项目
+        
+        Connects to the given project file in an existing DesignEnvironment or opens it.
+        
+        Args:
+            cst_file (os.PathLike): CST 项目文件的路径
+            
+        Returns:
+            Project: 项目实例
+            
+        Raises:
+            UserWarning: 如果项目不存在
+        """
+        proj = cst.interface.Project.connect_or_open(cst_file)
+        return Project(proj)
 
     @property
     def model3d(self) -> Model3D:
@@ -250,7 +343,202 @@ class DesignEnvironment:
         else:
             self._env = existing_env
         pass
+    
+    @staticmethod
+    def new(options: object = None, gui_linux: object = None, 
+            process_info: "cst.interface.DesignEnvironment.ProcessInfo" = None, 
+            env: object = None) -> "DesignEnvironment":
+        """打开新的设计环境并连接
+        
+        Opens a new DE and connects to it.
+        
+        Args:
+            options (object, optional): 命令行选项列表. Defaults to None.
+            gui_linux (object, optional): Linux 环境下是否使用 GUI. Defaults to None.
+            process_info (DesignEnvironment.ProcessInfo, optional): 进程信息. Defaults to None.
+            env (object, optional): 环境变量. Defaults to None.
+            
+        Returns:
+            DesignEnvironment: 新的设计环境实例
+        """
+        env_obj = cst.interface.DesignEnvironment.new(options, gui_linux, process_info, env)
+        return DesignEnvironment(env_obj)
+    
+    @staticmethod
+    def connect(pid: int = None, tcp_address: str = None) -> "DesignEnvironment":
+        """连接到现有的设计环境
+        
+        Connects to an existing DE with given PID or TCP address.
+        
+        Args:
+            pid (int, optional): 进程 ID. Defaults to None.
+            tcp_address (str, optional): TCP 地址. Defaults to None.
+            
+        Returns:
+            DesignEnvironment: 连接的设计环境实例
+        """
+        if pid is not None:
+            env_obj = cst.interface.DesignEnvironment.connect(pid)
+        elif tcp_address is not None:
+            env_obj = cst.interface.DesignEnvironment.connect(tcp_address)
+        else:
+            raise ValueError("Must provide either pid or tcp_address")
+        return DesignEnvironment(env_obj)
+    
+    @staticmethod
+    def connect_to_any() -> "DesignEnvironment":
+        """连接到任意现有的设计环境
+        
+        Connects to any existing DE.
+        
+        Returns:
+            DesignEnvironment: 连接的设计环境实例
+        """
+        env_obj = cst.interface.DesignEnvironment.connect_to_any()
+        return DesignEnvironment(env_obj)
+    
+    @staticmethod
+    def connect_to_any_or_new() -> "DesignEnvironment":
+        """连接到现有设计环境或创建新的
+        
+        Connects to any existing DE or opens a new one if none are open.
+        
+        Returns:
+            DesignEnvironment: 设计环境实例
+        """
+        env_obj = cst.interface.DesignEnvironment.connect_to_any_or_new()
+        return DesignEnvironment(env_obj)
 
     def new_mws(self) -> Project:
+        """创建新的 CST Microwave Studio 项目
+        
+        Creates a new CST Microwave Studio project and returns an instance of Project.
+        
+        Returns:
+            Project: 新创建的项目实例
+        """
         proj = self._env.new_mws()
         return Project(proj)
+    
+    def open_project(self, path: os.PathLike) -> Project:
+        """打开指定路径的项目
+        
+        Opens the project given by path in a new tab and returns an instance of Project.
+        
+        Args:
+            path (os.PathLike): CST 项目文件的路径
+            
+        Returns:
+            Project: 项目实例
+        """
+        proj = self._env.open_project(path)
+        return Project(proj)
+    
+    def close(self) -> None:
+        """关闭设计环境（CST Studio Suite）
+        
+        Closes the DesignEnvironment.
+        
+        Returns:
+            None
+        """
+        return self._env.close()
+    
+    def is_connected(self) -> bool:
+        """检查设计环境是否已连接
+        
+        Returns whether this object is still connected to a live DE.
+        
+        Returns:
+            bool: True if connected, False otherwise
+        """
+        return self._env.is_connected()
+    
+    def active_project(self) -> Project:
+        """获取当前活动项目
+        
+        Get the currently active project.
+        
+        Returns:
+            Project: 当前活动项目，如果没有则返回 None
+        """
+        proj = self._env.active_project()
+        return Project(proj) if proj else None
+    
+    def has_active_project(self) -> bool:
+        """查询设计环境是否有活动项目
+        
+        Queries whether the DesignEnvironment has an active project.
+        
+        Returns:
+            bool: True if has active project, False otherwise
+        """
+        return self._env.has_active_project()
+    
+    def get_open_projects(self, re_filter: str = ".*") -> List[Project]:
+        """返回当前打开的项目列表
+        
+        Returns a list of currently open projects matching the regular expression filter.
+        
+        Args:
+            re_filter (str): 项目名称的正则表达式过滤器. Defaults to ".*".
+            
+        Returns:
+            List[Project]: 打开的项目列表
+        """
+        projects = self._env.get_open_projects(re_filter)
+        return [Project(p) for p in projects]
+    
+    def list_open_projects(self) -> List[str]:
+        """返回当前打开项目的路径列表
+        
+        Returns the paths of the currently open projects.
+        
+        Returns:
+            List[str]: 打开项目的路径列表
+        """
+        return self._env.list_open_projects()
+    
+    def pid(self) -> int:
+        """返回设计环境的进程 ID
+        
+        Return the Process ID (PID) to which this DesignEnvironment is connected.
+        
+        Returns:
+            int: 进程 ID
+        """
+        return self._env.pid()
+    
+    def set_quiet_mode(self, flag: bool) -> None:
+        """设置静默模式
+        
+        When flag is set to True message boxes are suppressed.
+        
+        Args:
+            flag (bool): True 启用静默模式，False 禁用静默模式
+            
+        Returns:
+            None
+        """
+        return self._env.set_quiet_mode(flag)
+    
+    def in_quiet_mode(self) -> bool:
+        """查询是否处于静默模式
+        
+        Queries whether message boxes are currently suppressed.
+        
+        Returns:
+            bool: True if in quiet mode, False otherwise
+        """
+        return self._env.in_quiet_mode()
+
+
+def running_design_environments() -> List[int]:
+    """返回当前运行的设计环境进程 ID 列表
+    
+    Returns a list of process IDs (PIDs) of currently running DesignEnvironments.
+    
+    Returns:
+        List[int]: 运行中的设计环境进程 ID 列表
+    """
+    return cst.interface.running_design_environments()
